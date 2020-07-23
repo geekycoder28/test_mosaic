@@ -2,9 +2,10 @@ import { handleActions } from 'redux-actions'
 
 import { successAction, failAction } from 'utils/state-helpers'
 
-import { LIST_NEWS, REORDER } from './actions'
+import { LIST_NEWS, REORDER, GET_SOURCES } from './actions'
 
 const initialState = {
+  sources: [],
   listNews: [],
   news: null,
   page: 1,
@@ -43,6 +44,10 @@ export default handleActions(
       loading: false,
       status: type,
       error: payload,
+    }),
+    [successAction(GET_SOURCES)]: (state, { payload, type }) => ({
+      ...state,
+      sources: payload.sources,
     }),
 
     [REORDER]: (state, { payload, type }) => ({

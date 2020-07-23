@@ -4,8 +4,9 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 
 import { Layout, Row, Col, Pagination, Input, Spin } from 'antd'
 
-import { listNewsRequest, reorderRequest } from 'modules/news/actions'
+import { listNewsRequest, reorderRequest, getSourcesRequest } from 'modules/news/actions'
 import {
+  selectSources,
   selectNewsList,
   selectTotalListSize,
   selectPage,
@@ -19,8 +20,10 @@ const { Search } = Input
 const NewsPage = () => {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [search, setSearch] = useState('')
+  const [source, setSource] = useState('')
 
   const dispatch = useDispatch()
+  const sources = useSelector(selectSources)
   const listNews = useSelector(selectNewsList)
   const totalResults = useSelector(selectTotalListSize)
   const page = useSelector(selectPage)
@@ -28,8 +31,12 @@ const NewsPage = () => {
 
   useEffect(() => {
     setSelectedIndex(0)
-    dispatch(listNewsRequest({ page: 1, search }))
-  }, [dispatch, search])
+    dispatch(listNewsRequest({ page: 1, search, source }))
+  }, [dispatch, search, source])
+
+  useEffect(() => {
+    dispatch(getSourcesRequest())
+  }, [dispatch])
 
   const handlePage = (value) => {
     setSelectedIndex(0)
@@ -45,11 +52,16 @@ const NewsPage = () => {
   }
 
   const handleSearch = (value) => {
+    setSource('')
     setSearch(value)
   }
 
   const handleDetail = (index) => {
     setSelectedIndex(index)
+  }
+
+  const handleFilterSource = (id) => {
+    setSource(id)
   }
 
   const onDragEnd = (result) => {
@@ -131,7 +143,7 @@ const NewsPage = () => {
       </Sider>
       <Content>
         {listNews && listNews.length > 0 && (
-          <Detail news={listNews[selectedIndex]} />
+          <Detail news={listNews[selectedIndex]} sources={sources} onFilterSource={handleFilterSource} />
         )}
       </Content>
     </Layout>
